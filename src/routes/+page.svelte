@@ -9,6 +9,8 @@
     let baselineCount = 0; // record of word total at goal set
     let currentProgress = 0;
     let goalInput = '';
+    let tableWrapper;
+
   
     // Logs array: each entry has time, words, rating and an "editing" flag
     let logs = [];
@@ -219,6 +221,10 @@ function saveLog(log) {
       promptCallback();
     }
   }
+
+  $: if (tableWrapper) {
+    tableWrapper.scrollTop = tableWrapper.scrollHeight;
+  }
   </script>
   
   <!-- MAIN MARKUP -->
@@ -327,7 +333,7 @@ function saveLog(log) {
             <button on:click={resetLogs} class="reset-icon">↺</button>
           </div>
         {/if}
-        <div class="table-wrapper">
+        <div class="table-wrapper" bind:this={tableWrapper}>
         <table class:emptyTable={logs.length === 0}>
           <thead>
             <tr>
@@ -391,6 +397,7 @@ function saveLog(log) {
             {/each}
           </tbody>
         </table>
+        <div id="anchor"></div>
         </div>
       </div>
     </div>
@@ -409,308 +416,317 @@ function saveLog(log) {
     </div>
   {/if}
   
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Reenie+Beanie&family=Road+Rage&display=swap');
-  
-    /* Container & Global Styles */
-    .container {
-      background-color: #66FFED;
-      min-height: 90vh;
-      padding: 20px;
-    }
-    .logo {
-      text-align: center;
-      font-family: 'Reenie Beanie', cursive;
-      font-size: 4rem;
-      color: black;
-      margin-bottom: 20px;
-      margin-bottom: 4rem;
-    }
-    .logo div { line-height: 1.2; }
-    .main {
-      display: flex;
-      justify-content: center;
-      gap: 20rem;
-      font-family: 'Road Rage', cursive;
-    }
-    .left, .right { background: transparent; }
-    .left {
-      display: flex;
-      flex-direction: column;
-      gap: 3rem;
-      width: 400px;
-    }
-  
-    /* --- Goal Tracker (Top II.a.1) --- */
-    .goal-container {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      transform: skew(1deg, -2deg);
-    }
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Reenie+Beanie&family=Road+Rage&display=swap');
 
-    .goal-input-box {
-      background-color: #66FFED;
-      border: 1px solid black;
-      border-top-left-radius: 8.44px;
-      border-top-right-radius: 8.44px;
-      border-bottom-right-radius: 8.44px;
-      border-bottom-left-radius: 0;
-      color: black;
-      padding: 10px;
-      display: flex;
-      align-items: left;
-      box-shadow: -17px 29px 5.63px rgba(0, 0, 0, 0.25);
-      width: 15rem;
-      height: 2rem;
-      
-    }
-    .goal-input-box input {
-      font-family: 'Road Rage', cursive;
-      border: none;
-      background: transparent;
-      color: black;
-      outline: none;
-      width: 15rem;
-      font-size: 2rem;
-    }
-    .fixed-text { 
-      align-items: right; 
-      color: rgba(0,0,0,0.74); 
-      font-size: 2rem;
-    }
-    /* .goal-container button,
-    .goal-display button,
-    .goal-edit .edit-buttons button {
-      margin-top: 10px;
-    } */
-    .goal-container button {
-      background-color: #101010;
-      color: #66FFED;
-      border: none;
-      padding: 5px 10px;
-      cursor: pointer;
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
-      border-bottom-left-radius: 10px;
-      border-bottom-right-radius: 10px;
-      box-shadow: -17px 29px 5.63px rgba(0, 0, 0, 0.25);
-      font-family: 'Road Rage', cursive;
-      font-size: 2rem;
-      /* margin: -0.1rem 0.1rem; */
-      width: 10rem;
-    }
-    .goal-display {
-      transform: skew(1deg, -2deg);
-      margin-left: 1rem;
-      display: flex;
-      align-items: left;
-      justify-content: left;
-      gap: 10px;
-      background: transparent;
-    }
+  /* Container & Global Styles */
+  .container {
+    background-color: #66FFED;
+    min-height: 90vh;
+    padding: 20px;
+  }
+  .logo {
+    text-align: center;
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 4rem;
+    color: black;
+    margin-bottom: 20px;
+    margin-bottom: 4rem;
+  }
+  .logo div { line-height: 1.2; }
+  .main {
+    display: flex;
+    justify-content: center;
+    gap: 20rem;
+    font-family: 'Road Rage', cursive;
+  }
+  .left, .right { background: transparent; }
+  .left {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    width: 400px;
+  }
 
-    .goal-text {
-      text-shadow: -4px 4px 5.63px rgba(0,0,0,0.25);
-      font-size: 3.5rem;
-    }
+  /* --- Goal Tracker (Top II.a.1) --- */
+  .goal-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transform: skew(1deg, -2deg);
+  }
 
-    .goal-display .edit-icon {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 1.5rem;
-      padding-bottom: 1rem;
-      /* box-shadow: -17px 29px 5.63px rgba(0,0,0,0.25); */
-    }
-    .goal-edit { transform: skew(1deg, -2deg);  }
-    .goal-edit .edit-buttons {
-      display: flex;
-      
-      /* margin-top: 10px; */
-    }
-    .goal-edit .edit-buttons button:first-child {
-      background-color: #101010;
-      color: #66FFED;
-      border: none;
-      padding: 5px 10px;
-      cursor: pointer;
-      width: 7rem;
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
-      border-bottom-left-radius: 14px;
-      border-bottom-right-radius: 0;
-    }
-    .goal-edit .edit-buttons button:last-child {
-      background-color: #66FFED;
-      color: #101010;
-      border: 1px solid #101010;
-      padding: 5px 10px;
-      cursor: pointer;
-      width: 7rem;
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 14px;
-      border-bottom-left-radius: 0;
-    }
-  
-    /* --- Reminder & Log Form (Bottom II.a.2) --- */
-    .reminder-log {
-      transform: skew(1deg, -2deg);
-      background-color: #101010;
-      border-radius: 35px;
-      box-shadow: -28px 19px 4px rgba(0,0,0,0.25);
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      color: #66FFED;
-    }
-    .reminder {
-       display: flex; 
-       flex-direction: column; 
-       gap: 10px; 
-       padding: 1rem 1rem 1rem 1rem;
-    }
+  .goal-input-box {
+    background-color: #66FFED;
+    border: 1px solid black;
+    border-top-left-radius: 8.44px;
+    border-top-right-radius: 8.44px;
+    border-bottom-right-radius: 8.44px;
+    border-bottom-left-radius: 0;
+    color: black;
+    padding: 10px;
+    display: flex;
+    align-items: left;
+    box-shadow: -17px 29px 5.63px rgba(0, 0, 0, 0.25);
+    width: 15rem;
+    height: 2rem;
+    
+  }
+  .goal-input-box input {
+    font-family: 'Road Rage', cursive;
+    border: none;
+    background: transparent;
+    color: black;
+    outline: none;
+    width: 15rem;
+    font-size: 2rem;
+  }
+  .fixed-text { 
+    align-items: right; 
+    color: rgba(0,0,0,0.74); 
+    font-size: 2rem;
+  }
+  /* .goal-container button,
+  .goal-display button,
+  .goal-edit .edit-buttons button {
+    margin-top: 10px;
+  } */
+  .goal-container button {
+    background-color: #101010;
+    color: #66FFED;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    box-shadow: -17px 29px 5.63px rgba(0, 0, 0, 0.25);
+    font-family: 'Road Rage', cursive;
+    font-size: 2rem;
+    /* margin: -0.1rem 0.1rem; */
+    width: 10rem;
+  }
+  .goal-display {
+    transform: skew(1deg, -2deg);
+    margin-left: 1rem;
+    display: flex;
+    align-items: left;
+    justify-content: left;
+    gap: 10px;
+    background: transparent;
+  }
 
-    .reminder-top {
-      display: flex;
-      gap: 2rem;
-    }
-    .reminder-text { 
-      font-size: 2.5rem; 
-    }
-    .timer-display { display: flex; 
-      align-items: center; 
-      margin-top: -0.5rem;
-      gap: 10px;
-      font-size: 3.5rem;
-    }
-    .icon-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #66FFED;
-      font-size: 1.5rem;
-    }
-    .reminder-options {
-      display: flex;
-      gap: 3.5px;
-      font-size: 1.25rem;
-    }
+  .goal-text {
+    text-shadow: -4px 4px 5.63px rgba(0,0,0,0.25);
+    font-size: 3.5rem;
+  }
 
-    .reminder-option:hover {
-      background-color: #66FFED;
-      border: 1px solid #101010;
-      color: #101010;
-    }
+  .goal-display .edit-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding-bottom: 1rem;
+    /* box-shadow: -17px 29px 5.63px rgba(0,0,0,0.25); */
+  }
+  .goal-edit { transform: skew(1deg, -2deg);  }
+  .goal-edit .edit-buttons {
+    display: flex;
+    
+    /* margin-top: 10px; */
+  }
+  .goal-edit .edit-buttons button:first-child {
+    background-color: #101010;
+    color: #66FFED;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    width: 7rem;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 14px;
+    border-bottom-right-radius: 0;
+  }
+  .goal-edit .edit-buttons button:last-child {
+    background-color: #66FFED;
+    color: #101010;
+    border: 1px solid #101010;
+    padding: 5px 10px;
+    cursor: pointer;
+    width: 7rem;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 14px;
+    border-bottom-left-radius: 0;
+  }
 
-    .reminder-options.disabled {
-      opacity: 0.75;
-      pointer-events: none;
-    }
-    .reminder-option {
-      width: 77px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #101010;
-      border: 1px solid #66FFED;
-      cursor: pointer;
-    }
-    .reminder-option.selected {
-      background-color: #66FFED;
-      color: #101010;
-    }
-    .log-form { 
+  /* --- Reminder & Log Form (Bottom II.a.2) --- */
+  .reminder-log {
+    transform: skew(1deg, -2deg);
+    background-color: #101010;
+    border-radius: 35px;
+    box-shadow: -28px 19px 4px rgba(0,0,0,0.25);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    color: #66FFED;
+  }
+  .reminder {
       display: flex; 
       flex-direction: column; 
       gap: 10px; 
-      padding: 0rem 1rem 1rem 1rem ;
-    }
-    .log-top { 
-      display: flex; 
-      flex-direction: column;
-      gap: 5px; 
-      font-size: 2.5rem;
-    }
-    .log-top input {
-      background-color: #101010;
-      border: 1px solid #66FFED;
-      border-radius: 0.5rem;
-      color: #66FFED;
-      padding: 5px;
-      width: 15rem;
-      height: 2rem;
-      font-family: 'Road Rage', cursive;
-      font-size: 1.5rem;
-    }
-    .log-bottom { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      font-size: 2.5rem;
-    }
-    .rating { 
-      /* display: flex;  */
-      align-items: left; 
-      /* gap: 5px;  */
-      /* flex-direction: column; */
-    }
+      padding: 1rem 1rem 1rem 1rem;
+  }
 
-    .starsEtButton {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      gap: 6rem;
-    }
-    
-    .stars { 
-      display: flex; 
-      margin-top: 1rem;
-      gap: 2px; 
-      font-size: 3rem;
-    }
-    .star { cursor: pointer; }
+  .reminder-top {
+    display: flex;
+    gap: 2rem;
+  }
+  .reminder-text { 
+    font-size: 2.5rem; 
+  }
+  .timer-display { display: flex; 
+    align-items: center; 
+    margin-top: -0.5rem;
+    gap: 10px;
+    font-size: 3.5rem;
+  }
+  .icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #66FFED;
+    font-size: 1.5rem;
+  }
+  .reminder-options {
+    display: flex;
+    gap: 3.5px;
+    font-size: 1.25rem;
+  }
 
-    .stargon:hover {
-      fill: #66FFED;
-    }
+  .reminder-option:hover {
+    background-color: #66FFED;
+    border: 1px solid #101010;
+    color: #101010;
+  }
 
-    .log-form button {
-      background-color: #66FFED;
-      color: #101010;
-      font-size: 2rem;
-      font-family: 'Road Rage', cursive;
-      width: 5rem;
-      height: 3.5rem;
-      border: none;
-      border-radius: 0.5rem;
-      padding: 5px 10px;
-      cursor: pointer;
-    }
+  .reminder-options.disabled {
+    opacity: 0.75;
+    pointer-events: none;
+  }
+  .reminder-option {
+    width: 77px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #101010;
+    border: 1px solid #66FFED;
+    cursor: pointer;
+  }
+  .reminder-option.selected {
+    background-color: #66FFED;
+    color: #101010;
+  }
+  .log-form { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px; 
+    padding: 0rem 1rem 1rem 1rem ;
+  }
+  .log-top { 
+    display: flex; 
+    flex-direction: column;
+    gap: 5px; 
+    font-size: 2.5rem;
+  }
+  .log-top input {
+    background-color: #101010;
+    border: 1px solid #66FFED;
+    border-radius: 0.5rem;
+    color: #66FFED;
+    padding: 5px;
+    width: 15rem;
+    height: 2rem;
+    font-family: 'Road Rage', cursive;
+    font-size: 1.5rem;
+  }
+  .log-bottom { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    font-size: 2.5rem;
+  }
+  .rating { 
+    /* display: flex;  */
+    align-items: left; 
+    /* gap: 5px;  */
+    /* flex-direction: column; */
+  }
+
+  .starsEtButton {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 6rem;
+  }
   
-    /* --- Table (Right II.b) --- */
-    .right { 
-      width: 30rem; position: relative; 
-    }
+  .stars { 
+    display: flex; 
+    margin-top: 1rem;
+    gap: 2px; 
+    font-size: 3rem;
+  }
+  .star { cursor: pointer; }
 
-    .right table {
-      
-      width: 100%;
-      background-color: #101010;
-      color: #66FFED;
-      border-collapse: collapse;
-      box-shadow: 23px 20px 4px rgba(0,0,0,0.25);
-      max-height: 10rem;
-    }
-    .table-wrapper {
-  max-height: 35rem; /* adjust this value to match 7 rows' height */
-  overflow-y:scroll;
-  border-radius: 2rem;
-  box-shadow: 23px 20px 4px rgba(0,0,0,0.25);
+  .stargon:hover {
+    fill: #66FFED;
+  }
 
+  .log-form button {
+    background-color: #66FFED;
+    color: #101010;
+    font-size: 2rem;
+    font-family: 'Road Rage', cursive;
+    width: 5rem;
+    height: 3.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+
+  /* --- Table (Right II.b) --- */
+  .right { 
+    width: 30rem; position: relative; 
+  }
+
+  .right table {
+    
+    width: 100%;
+    background-color: #101010;
+    color: #66FFED;
+    border-collapse: collapse;
+    box-shadow: 23px 20px 4px rgba(0,0,0,0.25);
+    max-height: 10rem;
+  }
+  .table-wrapper {
+    max-height: 35rem; /* adjust this value to match 7 rows' height */
+    overflow-y:scroll;
+    border-radius: 2rem;
+    box-shadow: 23px 20px 4px rgba(0,0,0,0.25);
+    
+  }
+
+  .table-wrapper * {
+    overflow-anchor: none;
+  }
+
+  #anchor {
+  overflow-anchor: auto;
+  height: 1px;
 }
 
 /* Make the table header sticky so it stays visible during scroll */
@@ -745,112 +761,112 @@ function saveLog(log) {
 
   
 
-    .right th:last-child,
-    .right td:last-child {
-      border-right: none;
-    }
-    .logStars {
-      padding-top: 0.25rem;
-    }
-    .logStar {
-      /* padding-bottom: 1.2rem; */
-      padding-right: 0.3rem;
-    }
+  .right th:last-child,
+  .right td:last-child {
+    border-right: none;
+  }
+  .logStars {
+    padding-top: 0.25rem;
+  }
+  .logStar {
+    /* padding-bottom: 1.2rem; */
+    padding-right: 0.3rem;
+  }
 
-    .right tbody tr:last-child th,
-    .right tbody tr:last-child td {
-      border-bottom: none;
-    }
+  .right tbody tr:last-child th,
+  .right tbody tr:last-child td {
+    border-bottom: none;
+  }
 
-    .right th { background-color: #101010; font-weight: bold; }
-    .right thead { border-bottom: 1px solid #66FFED; border-radius: 2rem;}
-    .table-icon {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #66FFED;
-      margin-left: 5px;
-    }
-    .edit-input {
-      background-color: #101010;
-      border: 1px solid #66FFED;
-      border-radius: 4px;
-      color: #66FFED;
-      width: 50px;
-      padding: 2px;
-    }
+  .right th { background-color: #101010; font-weight: bold; }
+  .right thead { border-bottom: 1px solid #66FFED; border-radius: 2rem;}
+  .table-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #66FFED;
+    margin-left: 5px;
+  }
+  .edit-input {
+    background-color: #101010;
+    border: 1px solid #66FFED;
+    border-radius: 4px;
+    color: #66FFED;
+    width: 50px;
+    padding: 2px;
+  }
 
-    .save-btn {
-      background-color: #66FFED;
-      color: #101010;
-      font-size: 1.5rem;
-      font-family: 'Road Rage', cursive;
-      cursor: pointer;
-      border-radius: 0.5rem;
-      border:none;
-      width: 4rem;
-      height: 2rem;
-    }
+  .save-btn {
+    background-color: #66FFED;
+    color: #101010;
+    font-size: 1.5rem;
+    font-family: 'Road Rage', cursive;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    border:none;
+    width: 4rem;
+    height: 2rem;
+  }
 
-    .table-reset {
-      position: absolute;
-      top: -20px;
-      right: -20px;
-    }
-    .reset-icon {
-      background-color: black;
-      color: #66FFED;
-      border: none;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      cursor: pointer;
-    }
-  
-    /* --- Prompt Overlay --- */
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      backdrop-filter: blur(5px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: 'Road Rage', cursive;
-      font-size: 2rem;
-      
-    }
-    .prompt {
-      background-color: #101010;
-      color: #66FFED;
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-      border: 0.5px solid #66FFED;
+  .table-reset {
+    position: absolute;
+    top: -20px;
+    right: -20px;
+  }
+  .reset-icon {
+    background-color: black;
+    color: #66FFED;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+  }
 
-    }
-    .prompt-buttons {
-      margin-top: 20px;
-      display: flex;
-      justify-content: space-around;
-      font-family: 'Road Rage', cursive;
-      font-size: 1.5rem;
-    }
-    .prompt-buttons button {
-      background-color: #101010;
-      color: #66FFED;
-      border: 1px solid #66FFED;
-      padding: 5px 15px;
-      cursor: pointer;
-      border-radius: 5px;
-      font-family: 'Road Rage', cursive;
-      font-size: 1.5rem;
-    }
-    .prompt-buttons button:hover {
-      background-color: #66FFED;
-      color: #101010;
-    }
-  </style>
+  /* --- Prompt Overlay --- */
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Road Rage', cursive;
+    font-size: 2rem;
+    
+  }
+  .prompt {
+    background-color: #101010;
+    color: #66FFED;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    border: 0.5px solid #66FFED;
+
+  }
+  .prompt-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+    font-family: 'Road Rage', cursive;
+    font-size: 1.5rem;
+  }
+  .prompt-buttons button {
+    background-color: #101010;
+    color: #66FFED;
+    border: 1px solid #66FFED;
+    padding: 5px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-family: 'Road Rage', cursive;
+    font-size: 1.5rem;
+  }
+  .prompt-buttons button:hover {
+    background-color: #66FFED;
+    color: #101010;
+  }
+</style>
   
